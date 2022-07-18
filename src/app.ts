@@ -1,4 +1,4 @@
-import MyScene from './my-scene'
+import MyScene from './my-scene00'
 window.addEventListener('DOMContentLoaded', () => {
     // Create the game using the 'renderCanvas'.
     let game = new MyScene('renderCanvas');
