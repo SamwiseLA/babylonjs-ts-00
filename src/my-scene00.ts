@@ -48,17 +48,20 @@ export default class MyScene {
     var yeti1 = null;
     var yeti2 = null;
     var alien1 = null;
-    var test1 = null;
+    var object = [null, null];
 
-    //const testFileURL = "https://cdn-content-ingress.altvr.com/uploads/model/gltf/"
-    //const testFileName = "scene__1_.glb"
-    const testFileURL = "https://cdn-content-ingress.altvr.com/uploads/model/gltf/1691175786641359242/"
-    const testFileName = "GRIMECRAFT_Master_Sword.glb"
+    //const objectFileURL = "https://cdn-content-ingress.altvr.com/uploads/model/gltf/"
+    //const objectFileName = "scene__1_.glb"
+    const objectFileURL = [
+      "https://cdn-content-ingress.altvr.com/uploads/model/gltf/1691175786641359242/",
+      "https://cdn-content-ingress.altvr.com/uploads/model/gltf/1709202508846465311/"]
+    const objectFileName =[ 
+      "GRIMECRAFT_Master_Sword.glb",
+      "balloon2.glb"]
+    //https://cdn-content-ingress.altvr.com/uploads/model/gltf/1691175786641359242/GRIMECRAFT_Master_object.glb
 
-    //https://cdn-content-ingress.altvr.com/uploads/model/gltf/1691175786641359242/GRIMECRAFT_Master_test.glb
-
-    //const testFileURL = "https://samaaron.com/0babylon.js/files/glb/";
-    //const testFileName = "test.glb";
+    //const objectFileURL = "https://samaaron.com/0babylon.js/files/glb/";
+    //const objectFileName = "object.glb";
 
     BABYLON.SceneLoader.ImportMesh(
       "",
@@ -119,11 +122,11 @@ export default class MyScene {
 
     BABYLON.SceneLoader.ImportMesh(
       "",
-      testFileURL,
-      testFileName,
+      objectFileURL[0],
+      objectFileName[0],
       this._scene,
       function (newMeshes) {
-        test1 = newMeshes[0];
+        object[0] = newMeshes[0];
         newMeshes[0].position = new BABYLON.Vector3(3, 3, 0);
         newMeshes[0].scaling = new BABYLON.Vector3(.05, .05, .05);
         newMeshes[0].rotation = new BABYLON.Vector3(
@@ -133,6 +136,24 @@ export default class MyScene {
         );
       }
     );
+
+    BABYLON.SceneLoader.ImportMesh(
+      "",
+      objectFileURL[1],
+      objectFileName[1],
+      this._scene,
+      function (newMeshes) {
+        object[0] = newMeshes[0];
+        newMeshes[0].position = new BABYLON.Vector3(5, 7, 4);
+        newMeshes[0].scaling = new BABYLON.Vector3(.005, .005, .005);
+        newMeshes[0].rotation = new BABYLON.Vector3(
+          0 * radian,
+          90 * radian,
+          0 * radian
+        );
+      }
+    );
+
 
     this.BorderHouse()
 
