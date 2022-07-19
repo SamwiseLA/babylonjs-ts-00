@@ -151,7 +151,7 @@ export default class MyScene {
         const radianVal = 0.0174533;
         object[1] = newMeshes[0];
         newMeshes[0].name = "balloon";
-        newMeshes[0].position = new BABYLON.Vector3(16, 7, 4);
+        newMeshes[0].position = new BABYLON.Vector3(17, 7, 4);
         newMeshes[0].scaling = new BABYLON.Vector3(0.005, 0.005, 0.005);
         newMeshes[0].rotation = new BABYLON.Vector3(
           0 * radianVal,
@@ -174,17 +174,21 @@ export default class MyScene {
       cnt++;
     }
 
-    console.log(`waiting 5 secs... before rotation`);
-    await this.DelayIt(5);
+    this.BorderHouse();
+
+    console.log(`waiting 3 secs... before animation`);
+    await this.DelayIt(1);
+    console.log(`waiting 2 secs... before animation`);
+    await this.DelayIt(1);
+    console.log(`waiting 1 secs... before animation`);
+    await this.DelayIt(1);
 
     const rot = new BABYLON.Vector3(0, 3, 0);
     const pos = new BABYLON.Vector3(-.05, 0, 0);
 
-
     this.RotateObject(object[0], rot);
     this.PositionObject(object[1], pos);
 
-    this.BorderHouse();
 
     return this._scene;
   }
@@ -283,7 +287,7 @@ export default class MyScene {
     console.log(`Begin Position: ${object.name}`)
 
     let lastIntX = Math.floor(object.position._x);
-    for (let i = 1; i < 934; i++) {
+    for (let i = 1; i < 994; i++) {
       await this.DelayIt(0.05);
       object.position = new BABYLON.Vector3(
         object.position._x + newPosition._x,
@@ -294,8 +298,8 @@ export default class MyScene {
       if (currentIntX !== lastIntX){
         console.log(`Current Position ${object.name} X: ${currentIntX} Loop: ${i}`)
         lastIntX = currentIntX
-        if (currentIntX < -16){
-          object.position._x = 16
+        if (currentIntX < -17){
+          object.position._x = 17
         }
       }
     }
