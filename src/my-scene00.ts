@@ -31,6 +31,9 @@ export default class MyScene {
       this._scene
     );
     this._camera.attachControl(this._canvas, true);
+
+    this._camera.wheelPrecision = 10; //Mouse wheel speed
+
     const light = new BABYLON.HemisphericLight(
       "light",
       new BABYLON.Vector3(1, 1, 0),
