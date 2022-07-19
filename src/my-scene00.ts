@@ -18,7 +18,6 @@ export default class MyScene {
   }
 
   async createScene(): Promise<BABYLON.Scene> {
-
     this.radianVal = 0.0174533;
 
     this._scene = new BABYLON.Scene(this._engine);
@@ -132,6 +131,7 @@ export default class MyScene {
       function (newMeshes) {
         const radianVal = 0.0174533;
         object[0] = newMeshes[0];
+        newMeshes[0].name = "sword";
         newMeshes[0].position = new BABYLON.Vector3(3, 2.5, 0);
         newMeshes[0].scaling = new BABYLON.Vector3(0.05, 0.05, 0.05);
         newMeshes[0].rotation = new BABYLON.Vector3(
@@ -150,7 +150,8 @@ export default class MyScene {
       function (newMeshes) {
         const radianVal = 0.0174533;
         object[1] = newMeshes[0];
-        newMeshes[0].position = new BABYLON.Vector3(5, 7, 4);
+        newMeshes[0].name = "balloon";
+        newMeshes[0].position = new BABYLON.Vector3(16, 7, 4);
         newMeshes[0].scaling = new BABYLON.Vector3(0.005, 0.005, 0.005);
         newMeshes[0].rotation = new BABYLON.Vector3(
           0 * radianVal,
@@ -160,29 +161,28 @@ export default class MyScene {
       }
     );
 
-    const rot = new BABYLON.Vector3(
-      0,
-      3,
-      0
-    );
-
-    let cnt = 0
+    let cnt = 0;
     while (object[1] === null && cnt < 5) {
       await this.DelayIt(2);
-      console.log(`waiting for object [0], try: ${cnt}`)
-      cnt++
+      console.log(`waiting for object [0], try: ${cnt}`);
+      cnt++;
     }
-    cnt = 0
+    cnt = 0;
     while (object[0] === null && cnt < 5) {
       await this.DelayIt(2);
-      console.log(`waiting for object [1], try: ${cnt}`)
-      cnt++
+      console.log(`waiting for object [1], try: ${cnt}`);
+      cnt++;
     }
 
-    console.log(`waiting 5 secs... before rotation`)
+    console.log(`waiting 5 secs... before rotation`);
     await this.DelayIt(5);
 
+    const rot = new BABYLON.Vector3(0, 3, 0);
+    const pos = new BABYLON.Vector3(-.05, 0, 0);
+
+
     this.RotateObject(object[0], rot);
+    this.PositionObject(object[1], pos);
 
     this.BorderHouse();
 
@@ -242,19 +242,67 @@ export default class MyScene {
 
   async RotateObject(
     object: BABYLON.AbstractMesh,
-    newRotation: BABYLON.Vector3
+    newRotation: BABYLON.Vector3,
+    loop = 121,
+    delay = .5
   ): Promise<void> {
+    console.log(`Begin Rotation: ${object.name}`)
 
-    for (let i = 1; i < 121; i++) {
-      await this.DelayIt(.5);
-      const radianVal = 0.0174533;
+    const radianVal = 0.0174533;
+    let lastIntY = object.rotation._y / radianVal;
+    lastIntY = Math.floor(lastIntY);
+
+    for (let i = 1; i < loop; i++) {
+      await this.DelayIt(delay);
 
       object.rotation = new BABYLON.Vector3(
         (object.rotation._x / radianVal + newRotation._x) * radianVal,
         (object.rotation._y / radianVal + newRotation._y) * radianVal,
         (object.rotation._z / radianVal + newRotation._z) * radianVal
       );
+      let currentIntY = object.rotation._y / radianVal;
+      currentIntY = Math.floor(currentIntY);
+      if (currentIntY !== lastIntY){
+        console.log(`Current Rotation ${object.name} Y: ${currentIntY} Loop: ${i}`)
+        lastIntY = currentIntY
+        if (currentIntY < 0){
+          object.rotation._y = 360 * radianVal
+        }
+        if (currentIntY > 360){
+          object.rotation._y = 0
+        }
+      }
+
     }
+  }
+
+  async PositionObject(
+    object: BABYLON.AbstractMesh,
+    newPosition: BABYLON.Vector3
+  ): Promise<void> {
+    console.log(`Begin Position: ${object.name}`)
+
+    let lastIntX = Math.floor(object.position._x);
+    for (let i = 1; i < 934; i++) {
+      await this.DelayIt(0.05);
+      object.position = new BABYLON.Vector3(
+        object.position._x + newPosition._x,
+        object.position._y + newPosition._y,
+        object.position._z + newPosition._z
+      );
+      const currentIntX = Math.floor(object.position._x);
+      if (currentIntX !== lastIntX){
+        console.log(`Current Position ${object.name} X: ${currentIntX} Loop: ${i}`)
+        lastIntX = currentIntX
+        if (currentIntX < -16){
+          object.position._x = 16
+        }
+      }
+    }
+    const rot = new BABYLON.Vector3(0, -1, 0);
+
+    this. RotateObject(object, rot, 271, .05);
+
   }
 
   private DelayIt = (secs: number) =>
