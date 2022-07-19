@@ -9,6 +9,7 @@ export default class MyScene {
   //private _camera: BABYLON.FreeCamera;
   private _camera: BABYLON.ArcRotateCamera;
   private _light: BABYLON.Light;
+  private radianVal: number;
 
   constructor(canvasElement: string) {
     // Create canvas and engine.
@@ -16,8 +17,9 @@ export default class MyScene {
     this._engine = new BABYLON.Engine(this._canvas, true);
   }
 
-  createScene(): BABYLON.Scene {
-    const radian = 0.0174533;
+  async createScene(): Promise<BABYLON.Scene> {
+
+    this.radianVal = 0.0174533;
 
     this._scene = new BABYLON.Scene(this._engine);
 
@@ -48,16 +50,15 @@ export default class MyScene {
     var yeti1 = null;
     var yeti2 = null;
     var alien1 = null;
-    var object = [null, null];
+    var object: BABYLON.AbstractMesh[] = [null, null];
 
     //const objectFileURL = "https://cdn-content-ingress.altvr.com/uploads/model/gltf/"
     //const objectFileName = "scene__1_.glb"
     const objectFileURL = [
       "https://cdn-content-ingress.altvr.com/uploads/model/gltf/1691175786641359242/",
-      "https://cdn-content-ingress.altvr.com/uploads/model/gltf/1709202508846465311/"]
-    const objectFileName =[ 
-      "GRIMECRAFT_Master_Sword.glb",
-      "balloon2.glb"]
+      "https://cdn-content-ingress.altvr.com/uploads/model/gltf/1709202508846465311/",
+    ];
+    const objectFileName = ["GRIMECRAFT_Master_Sword.glb", "balloon2.glb"];
     //https://cdn-content-ingress.altvr.com/uploads/model/gltf/1691175786641359242/GRIMECRAFT_Master_object.glb
 
     //const objectFileURL = "https://samaaron.com/0babylon.js/files/glb/";
@@ -70,14 +71,15 @@ export default class MyScene {
       //Assets.meshes.Yeti.filename,
       "Yeti.gltf",
       this._scene,
-      function (newMeshes) {
+      function (newMeshes, radian) {
+        const radianVal = 0.0174533;
         yeti1 = newMeshes[0];
         newMeshes[0].position = new BABYLON.Vector3(-2.2, 0, 0);
         newMeshes[0].scaling = new BABYLON.Vector3(0.025, 0.04, 0.04);
         newMeshes[0].rotation = new BABYLON.Vector3(
-          0 * radian,
-          90 * radian,
-          0 * radian
+          0 * radianVal,
+          90 * radianVal,
+          0 * radianVal
         );
       }
     );
@@ -90,13 +92,14 @@ export default class MyScene {
       "Yeti.gltf",
       this._scene,
       function (newMeshes) {
+        const radianVal = 0.0174533;
         yeti2 = newMeshes[0];
         newMeshes[0].position = new BABYLON.Vector3(4, 0, 0);
         newMeshes[0].scaling = new BABYLON.Vector3(0.025, 0.04, 0.04);
         newMeshes[0].rotation = new BABYLON.Vector3(
-          0 * radian,
-          -90 * radian,
-          0 * radian
+          0 * radianVal,
+          -90 * radianVal,
+          0 * radianVal
         );
       }
     );
@@ -109,13 +112,14 @@ export default class MyScene {
       "Alien.gltf",
       this._scene,
       function (newMeshes) {
+        const radianVal = 0.0174533;
         alien1 = newMeshes[0];
         newMeshes[0].position = new BABYLON.Vector3(1, 2, -0.5);
         newMeshes[0].scaling = new BABYLON.Vector3(1, 1, 1);
         newMeshes[0].rotation = new BABYLON.Vector3(
-          20 * radian,
-          180 * radian,
-          0 * radian
+          20 * radianVal,
+          180 * radianVal,
+          0 * radianVal
         );
       }
     );
@@ -126,13 +130,14 @@ export default class MyScene {
       objectFileName[0],
       this._scene,
       function (newMeshes) {
+        const radianVal = 0.0174533;
         object[0] = newMeshes[0];
-        newMeshes[0].position = new BABYLON.Vector3(3, 3, 0);
-        newMeshes[0].scaling = new BABYLON.Vector3(.05, .05, .05);
+        newMeshes[0].position = new BABYLON.Vector3(3, 2.5, 0);
+        newMeshes[0].scaling = new BABYLON.Vector3(0.05, 0.05, 0.05);
         newMeshes[0].rotation = new BABYLON.Vector3(
-          0 * radian,
-          -90 * radian,
-          90 * radian
+          0 * radianVal,
+          0 * radianVal,
+          0 * radianVal
         );
       }
     );
@@ -143,19 +148,43 @@ export default class MyScene {
       objectFileName[1],
       this._scene,
       function (newMeshes) {
-        object[0] = newMeshes[0];
+        const radianVal = 0.0174533;
+        object[1] = newMeshes[0];
         newMeshes[0].position = new BABYLON.Vector3(5, 7, 4);
-        newMeshes[0].scaling = new BABYLON.Vector3(.005, .005, .005);
+        newMeshes[0].scaling = new BABYLON.Vector3(0.005, 0.005, 0.005);
         newMeshes[0].rotation = new BABYLON.Vector3(
-          0 * radian,
-          90 * radian,
-          0 * radian
+          0 * radianVal,
+          90 * radianVal,
+          0 * radianVal
         );
       }
     );
 
+    const rot = new BABYLON.Vector3(
+      0,
+      3,
+      0
+    );
 
-    this.BorderHouse()
+    let cnt = 0
+    while (object[1] === null && cnt < 5) {
+      await this.DelayIt(2);
+      console.log(`waiting for object [0], try: ${cnt}`)
+      cnt++
+    }
+    cnt = 0
+    while (object[0] === null && cnt < 5) {
+      await this.DelayIt(2);
+      console.log(`waiting for object [1], try: ${cnt}`)
+      cnt++
+    }
+
+    console.log(`waiting 5 secs... before rotation`)
+    await this.DelayIt(5);
+
+    this.RotateObject(object[0], rot);
+
+    this.BorderHouse();
 
     return this._scene;
   }
@@ -166,8 +195,8 @@ export default class MyScene {
     materialRed.alpha = 1;
     materialRed.diffuseColor = new BABYLON.Color3(1.0, 0, 0);
 
-    const height = .8;
-    const posY = .3;
+    const height = 0.8;
+    const posY = 0.3;
 
     const startfenceX = -1;
     const fenceXPosts = 42;
@@ -176,7 +205,7 @@ export default class MyScene {
     for (let i = 0; i < fenceXPosts; i++) {
       var sphere = BABYLON.MeshBuilder.CreateSphere(
         "sphere",
-        { diameter: 0.1, diameterY: height},
+        { diameter: 0.1, diameterY: height },
         this._scene
       );
       sphere.material = materialRed;
@@ -185,7 +214,7 @@ export default class MyScene {
     for (let i = 0; i < fenceXPosts; i++) {
       var sphere = BABYLON.MeshBuilder.CreateSphere(
         "sphere",
-        { diameter: 0.1, diameterY: height},
+        { diameter: 0.1, diameterY: height },
         this._scene
       );
       sphere.material = materialRed;
@@ -194,7 +223,7 @@ export default class MyScene {
     for (let i = 0; i < fenceZPosts; i++) {
       var sphere = BABYLON.MeshBuilder.CreateSphere(
         "sphere",
-        { diameter: 0.1, diameterY: height},
+        { diameter: 0.1, diameterY: height },
         this._scene
       );
       sphere.material = materialRed;
@@ -203,7 +232,7 @@ export default class MyScene {
     for (let i = 0; i < fenceZPosts; i++) {
       var sphere = BABYLON.MeshBuilder.CreateSphere(
         "sphere",
-        { diameter: 0.1, diameterY: height},
+        { diameter: 0.1, diameterY: height },
         this._scene
       );
       sphere.material = materialRed;
@@ -211,6 +240,25 @@ export default class MyScene {
     }
   }
 
+  async RotateObject(
+    object: BABYLON.AbstractMesh,
+    newRotation: BABYLON.Vector3
+  ): Promise<void> {
+
+    for (let i = 1; i < 121; i++) {
+      await this.DelayIt(.5);
+      const radianVal = 0.0174533;
+
+      object.rotation = new BABYLON.Vector3(
+        (object.rotation._x / radianVal + newRotation._x) * radianVal,
+        (object.rotation._y / radianVal + newRotation._y) * radianVal,
+        (object.rotation._z / radianVal + newRotation._z) * radianVal
+      );
+    }
+  }
+
+  private DelayIt = (secs: number) =>
+    new Promise((res) => setTimeout(res, secs * 1000));
 
   doRender(): void {
     // Run the render loop.
