@@ -43,11 +43,15 @@ export default class MyScene {
     //BABYLON.SceneLoader.ImportMeshAsync("", "https://assets.babylonjs.com/meshes/", "both_houses_scene.babylon");
     //BABYLON.SceneLoader.ImportMeshAsync("semi_house", "https://assets.babylonjs.com/meshes/", "both_houses_scene.babylon");
     //BABYLON.SceneLoader.ImportMeshAsync("ground", "https://assets.babylonjs.com/meshes/", "both_houses_scene.babylon");
-    BABYLON.SceneLoader.ImportMeshAsync(
+    await BABYLON.SceneLoader.ImportMeshAsync(
       ["semi_house", "ground"],
       "https://assets.babylonjs.com/meshes/",
       "both_houses_scene.babylon"
     );
+
+    const ground: any = this._scene.rootNodes[2];
+
+    ground.scaling = new BABYLON.Vector3(4, 1, 1);
 
     var yeti1 = null;
     var yeti2 = null;
@@ -164,6 +168,8 @@ export default class MyScene {
       }
     );
 
+    this.BorderHouse();
+
     let cnt = 0;
     while (object[1] === null && cnt < 5) {
       await this.DelayIt(2);
@@ -176,8 +182,6 @@ export default class MyScene {
       console.log(`waiting for object [1], try: ${cnt}`);
       cnt++;
     }
-
-    this.BorderHouse();
 
     console.log(`waiting 3 secs... before animation`);
     await this.DelayIt(1);
@@ -192,6 +196,9 @@ export default class MyScene {
     this.RotateObject(object[0], rot);
     this.PositionObject(object[1], pos);
 
+    // const ground: any = this._scene.rootNodes[2];
+
+    // ground.scaling = new BABYLON.Vector3(3, 1, 1);
 
     return this._scene;
   }
@@ -250,7 +257,7 @@ export default class MyScene {
   async RotateObject(
     object: BABYLON.AbstractMesh,
     newRotation: BABYLON.Vector3,
-    loop = 121,
+    loop = 211,
     delay = .5
   ): Promise<void> {
     console.log(`Begin Rotation: ${object.name}`)
