@@ -50,7 +50,7 @@ export default class MyScene {
     this._light = new BABYLON.DirectionalLight("dir01", lightDir, this._scene);
     this._light.intensity = 1;
 
-    this._light.position = new BABYLON.Vector3(20, 150, 70);
+    this._light.position = new BABYLON.Vector3(0, 150, 70);
 
     const box = BABYLON.MeshBuilder.CreateBox("box", {});
     box.position = new BABYLON.Vector3(0, .5,-5);
@@ -103,15 +103,16 @@ export default class MyScene {
     var yeti1 = null;
     var yeti2 = null;
     var alien1 = null;
-    var object: BABYLON.AbstractMesh[] = [null, null];
+    var object: BABYLON.AbstractMesh[] = [null, null, null];
 
     //const objectFileURL = "https://cdn-content-ingress.altvr.com/uploads/model/gltf/"
     //const objectFileName = "scene__1_.glb"
     const objectFileURL = [
       "https://cdn-content-ingress.altvr.com/uploads/model/gltf/1691175786641359242/",
       "https://cdn-content-ingress.altvr.com/uploads/model/gltf/1709202508846465311/",
+      "https://cdn-content-ingress.altvr.com/uploads/model/gltf/2050551949928956602/"
     ];
-    const objectFileName = ["GRIMECRAFT_Master_Sword.glb", "balloon2.glb"];
+    const objectFileName = ["GRIMECRAFT_Master_Sword.glb", "balloon2.glb", "CurtsShinyGreenBox.glb"];
     //https://cdn-content-ingress.altvr.com/uploads/model/gltf/1691175786641359242/GRIMECRAFT_Master_object.glb
 
     //const objectFileURL = "https://samaaron.com/0babylon.js/files/glb/";
@@ -220,18 +221,43 @@ export default class MyScene {
       }
     );
 
+    BABYLON.SceneLoader.ImportMesh(
+      "",
+      objectFileURL[2],
+      objectFileName[2],
+      this._scene,
+      function (newMeshes) {
+        const radianVal = 0.0174533;
+        object[2] = newMeshes[0];
+        newMeshes[0].name = "curtsCube";
+        newMeshes[0].position = new BABYLON.Vector3(1, 6, 4);
+        newMeshes[0].scaling = new BABYLON.Vector3(2, .4, .3);
+        newMeshes[0].rotation = new BABYLON.Vector3(
+          0 * radianVal,
+          90 * radianVal,
+          0 * radianVal
+        );
+      }
+    );
+
     this.BorderHouse();
 
     let cnt = 0;
+    while (object[2] === null && cnt < 5) {
+      await this.DelayIt(2);
+      console.log(`waiting for object [2], try: ${cnt}`);
+      cnt++;
+    }
+    cnt = 0;
     while (object[1] === null && cnt < 5) {
       await this.DelayIt(2);
-      console.log(`waiting for object [0], try: ${cnt}`);
+      console.log(`waiting for object [1], try: ${cnt}`);
       cnt++;
     }
     cnt = 0;
     while (object[0] === null && cnt < 5) {
       await this.DelayIt(2);
-      console.log(`waiting for object [1], try: ${cnt}`);
+      console.log(`waiting for object [0], try: ${cnt}`);
       cnt++;
     }
 
@@ -243,10 +269,12 @@ export default class MyScene {
     await this.DelayIt(1);
 
     const rot = new BABYLON.Vector3(0, 3, 0);
+    const rotCube = new BABYLON.Vector3(0, -.5, 0);
     const pos = new BABYLON.Vector3(-.05, 0, 0);
 
     this.RotateObject(object[0], rot);
     this.PositionObject(object[1], pos);
+    this.RotateObject(object[2], rotCube, 3601, .0125);
 
     // const ground: any = this._scene.rootNodes[2];
 
