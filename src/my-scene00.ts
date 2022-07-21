@@ -257,9 +257,13 @@ export default class MyScene {
 
   BorderHouse(): void {
     // My attempt to color the sphere
-    var materialRed = new BABYLON.StandardMaterial("", this._scene);
+    const materialRed = new BABYLON.StandardMaterial("", this._scene);
     materialRed.alpha = 1;
     materialRed.diffuseColor = new BABYLON.Color3(1.0, 0, 0);
+
+    const materialYellow = new BABYLON.StandardMaterial("", this._scene);
+    materialYellow.alpha = 1;
+    materialYellow.diffuseColor = BABYLON.Color3.Yellow();
 
     const height = 0.8;
     const posY = 0.3;
@@ -274,7 +278,7 @@ export default class MyScene {
         { diameter: 0.1, diameterY: height },
         this._scene
       );
-      sphere.material = materialRed;
+      sphere.material = materialYellow;
       sphere.position = new BABYLON.Vector3(i * 0.1 + startfenceX, posY, -1);
     }
     for (let i = 0; i < fenceXPosts; i++) {
@@ -283,7 +287,7 @@ export default class MyScene {
         { diameter: 0.1, diameterY: height },
         this._scene
       );
-      sphere.material = materialRed;
+      sphere.material = materialYellow;
       sphere.position = new BABYLON.Vector3(i * 0.1 + startfenceX, posY, 1);
     }
     for (let i = 0; i < fenceZPosts; i++) {
@@ -292,7 +296,7 @@ export default class MyScene {
         { diameter: 0.1, diameterY: height },
         this._scene
       );
-      sphere.material = materialRed;
+      sphere.material = materialYellow;
       sphere.position = new BABYLON.Vector3(startfenceX, posY, i * 0.1 + -1);
     }
     for (let i = 0; i < fenceZPosts; i++) {
@@ -301,7 +305,7 @@ export default class MyScene {
         { diameter: 0.1, diameterY: height },
         this._scene
       );
-      sphere.material = materialRed;
+      sphere.material = materialYellow;
       sphere.position = new BABYLON.Vector3(3.15, posY, i * 0.1 + -1);
     }
   }
