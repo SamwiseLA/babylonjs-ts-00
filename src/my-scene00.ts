@@ -8,7 +8,7 @@ export default class MyScene {
   private _scene: BABYLON.Scene;
   //private _camera: BABYLON.FreeCamera;
   private _camera: BABYLON.ArcRotateCamera;
-  private _light: BABYLON.Light;
+  private _light: BABYLON.DirectionalLight;
   private radianVal: number;
 
   constructor(canvasElement: string) {
@@ -22,6 +22,8 @@ export default class MyScene {
 
     this._scene = new BABYLON.Scene(this._engine);
 
+    this._scene.ambientColor = new BABYLON.Color3(0.3, 0.3, 0.3);
+    
     this._camera = new BABYLON.ArcRotateCamera(
       "camera",
       -Math.PI / 2,
@@ -34,25 +36,70 @@ export default class MyScene {
 
     this._camera.wheelPrecision = 10; //Mouse wheel speed
 
-    const light = new BABYLON.HemisphericLight(
-      "light",
-      new BABYLON.Vector3(1, 1, 0),
-      this._scene
-    );
+    const lightDir = new BABYLON.Vector3(0 * this.radianVal, 0 * this.radianVal, 45 * this.radianVal);
+
+    //const lightHem = new BABYLON.HemisphericLight(
+    //  "lightHem",
+    //  lightDir,
+    //  this._scene
+    //);
+
+    //lightHem.intensity = 1;
+
+    //this._light = new BABYLON.DirectionalLight("dir01", new BABYLON.Vector3(0, -0.5, -1.0), this._scene);
+    this._light = new BABYLON.DirectionalLight("dir01", lightDir, this._scene);
+    this._light.intensity = 1;
+
+    this._light.position = new BABYLON.Vector3(20, 150, 70);
+
+    const box = BABYLON.MeshBuilder.CreateBox("box", {});
+    box.position = new BABYLON.Vector3(0, .5,-5);
+
+    //box.rotation = this._light.direction;
+    //box.scaling.x = .1;
+    box.scaling.z = .1;
+    //box.position = new BABYLON.Vector3(0, 5, -5);
 
     //BABYLON.SceneLoader.ImportMeshAsync("", "https://assets.babylonjs.com/meshes/", "both_houses_scene.babylon");
     //BABYLON.SceneLoader.ImportMeshAsync("semi_house", "https://assets.babylonjs.com/meshes/", "both_houses_scene.babylon");
     //BABYLON.SceneLoader.ImportMeshAsync("ground", "https://assets.babylonjs.com/meshes/", "both_houses_scene.babylon");
     await BABYLON.SceneLoader.ImportMeshAsync(
-      ["semi_house", "ground"],
+      ["semi_house"],
       "https://assets.babylonjs.com/meshes/",
       "both_houses_scene.babylon"
     );
 
-    const ground: any = this._scene.rootNodes[2];
+    //let ground: any = this._scene.rootNodes[2];
+    const ground = BABYLON.Mesh.CreateGround("ground", 40, 10, 1, this._scene, false);
+    //const ground = BABYLON.Mesh.CreateGround("ground", 1000, 1000, 1, this._scene, false);
 
-    ground.scaling = new BABYLON.Vector3(4, 1, 1);
+    //ground.scaling = new BABYLON.Vector3(4, 1, 1);
 
+    var groundMaterialShadow = new BABYLON.StandardMaterial("groundShadow", this._scene);
+    groundMaterialShadow.diffuseColor = new BABYLON.Color3(.2, .2, .2);
+    groundMaterialShadow.specularColor = new BABYLON.Color3(0, 0, 0);
+
+    var groundMaterial = new BABYLON.StandardMaterial("ground", this._scene);
+    groundMaterial.diffuseColor = new BABYLON.Color3(0, .5, 0);
+    groundMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+    ground.material = groundMaterial;
+
+    ground.receiveShadows = true;
+
+    // Shadows
+    var shadowGenerator = new BABYLON.ShadowGenerator(1024, this._light);
+
+    const shadowMap = shadowGenerator.getShadowMap()
+    const shadowBox = box.clone();
+    shadowBox.position.z = box.position.z + .5;
+    shadowBox.position.y = box.position.y - .5;
+    shadowBox.rotation =  
+      new BABYLON.Vector3(box.rotation.x + (90 * this.radianVal), box.rotation.y, box.rotation.z);
+
+    shadowBox.material = groundMaterialShadow;
+
+    shadowMap.renderList.push(shadowBox);
+    
     var yeti1 = null;
     var yeti2 = null;
     var alien1 = null;
@@ -77,9 +124,14 @@ export default class MyScene {
       //Assets.meshes.Yeti.filename,
       "Yeti.gltf",
       this._scene,
-      function (newMeshes, radian) {
+      function (newMeshes, particleSystems, skeletons) {
         const radianVal = 0.0174533;
         yeti1 = newMeshes[0];
+        const yeti1Shadow = newMeshes[1];
+        yeti1Shadow.position.z = -.5;
+        // Shadows
+        // var shadowGenerator = new BABYLON.ShadowGenerator(1024, this._light);
+        shadowGenerator.getShadowMap().renderList.push(yeti1Shadow);
         newMeshes[0].position = new BABYLON.Vector3(-2.2, 0, 0);
         newMeshes[0].scaling = new BABYLON.Vector3(0.025, 0.04, 0.04);
         newMeshes[0].rotation = new BABYLON.Vector3(
@@ -97,7 +149,7 @@ export default class MyScene {
       //Assets.meshes.Yeti.filename,
       "Yeti.gltf",
       this._scene,
-      function (newMeshes) {
+      function (newMeshes, particleSystems, skeletons) {
         const radianVal = 0.0174533;
         yeti2 = newMeshes[0];
         newMeshes[0].position = new BABYLON.Vector3(4, 0, 0);
