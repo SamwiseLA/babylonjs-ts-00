@@ -52,7 +52,7 @@ export default class MyScene {
 
     //this._light = new BABYLON.DirectionalLight("dir01", new BABYLON.Vector3(0, -0.5, -1.0), this._scene);
     this._light = new BABYLON.DirectionalLight("dir01", lightDir, this._scene);
-    this._light.intensity = .5;
+    this._light.intensity = 0.5;
 
     this._light.position = new BABYLON.Vector3(0, 150, 70);
 
@@ -254,7 +254,9 @@ export default class MyScene {
         );
       }
     );
+
     this.LoadVideo();
+    
     this.BorderHouse();
 
     this.FloorWallArea();
@@ -285,9 +287,7 @@ export default class MyScene {
     console.log(`waiting 1 secs... before animation`);
     await this.DelayIt(1);
 
-    const rotCube = new BABYLON.Vector3(0, -0.5, 0);
-
-    this.RotateObject(object[2], rotCube, 3601, 0.0125);
+    this.RotateCube(object[2]);
 
     this.SwordRotate(object[0]);
 
@@ -301,55 +301,94 @@ export default class MyScene {
     return this._scene;
   }
 
-  FloorWallArea() : void {
+  async RotateCube(cube: BABYLON.AbstractMesh): Promise<void> {
+    const rotCube = new BABYLON.Vector3(0, -0.5, 0);
+
+    for (var i = 0; i < 10;i++){
+      await this.RotateObject(cube, rotCube, 3601, 0.0125);
+    }
+  }
+
+  FloorWallArea(): void {
     // Our built-in 'ground' shape.
-    var ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, this._scene);
-    var backWall = BABYLON.MeshBuilder.CreatePlane("backWall", { width: 6, height: 6 }, this._scene);
-    let groundMaterial = new BABYLON.StandardMaterial("Ground Material", this._scene);
-    let backMaterial = new BABYLON.StandardMaterial("Back Material", this._scene);
+    var ground = BABYLON.MeshBuilder.CreateGround(
+      "ground",
+      { width: 6, height: 6 },
+      this._scene
+    );
+    var backWall = BABYLON.MeshBuilder.CreatePlane(
+      "backWall",
+      { width: 6, height: 6 },
+      this._scene
+    );
+    let groundMaterial = new BABYLON.StandardMaterial(
+      "Ground Material",
+      this._scene
+    );
+    let backMaterial = new BABYLON.StandardMaterial(
+      "Back Material",
+      this._scene
+    );
     ground.material = groundMaterial;
     backWall.material = backMaterial;
 
-    let groundTexture = new BABYLON.Texture("https://dl.dropbox.com/s/d774xc5km3l1gst/Floor-Stone-Portuguesa-Ground-Texture-Sidewalk-5224213.jpg?dl=0", this._scene);
-    let backTexture = new BABYLON.Texture("https://image.shutterstock.com/image-photo/basalt-stones-background-reynisfjara-beach-600w-2124570419.jpg", this._scene);
-   
-   
-    const temp1 =  <BABYLON.StandardMaterial>ground.material;
-    const temp2 =  <BABYLON.StandardMaterial>backWall.material;
+    let groundTexture = new BABYLON.Texture(
+      "https://dl.dropbox.com/s/d774xc5km3l1gst/Floor-Stone-Portuguesa-Ground-Texture-Sidewalk-5224213.jpg?dl=0",
+      this._scene
+    );
+    let backTexture = new BABYLON.Texture(
+      "https://image.shutterstock.com/image-photo/basalt-stones-background-reynisfjara-beach-600w-2124570419.jpg",
+      this._scene
+    );
+
+    const temp1 = <BABYLON.StandardMaterial>ground.material;
+    const temp2 = <BABYLON.StandardMaterial>backWall.material;
 
     temp1.diffuseTexture = groundTexture;
     temp2.diffuseTexture = backTexture;
     temp1.diffuseColor = BABYLON.Color3.Red(); //{r: 200/255, g: 0, b: 200/255};
-    temp2.diffuseColor = new BABYLON.Color3(200 / 255, 0, 200 / 255 );
+    temp2.diffuseColor = new BABYLON.Color3(200 / 255, 0, 200 / 255);
 
-    backWall.rotation = new BABYLON.Vector3(BABYLON.Angle.FromDegrees(0).radians(), BABYLON.Angle.FromDegrees(0).radians(), BABYLON.Angle.FromDegrees(0).radians())
-    backWall.position = new BABYLON.Vector3(0,3,3)
+    backWall.rotation = new BABYLON.Vector3(
+      BABYLON.Angle.FromDegrees(0).radians(),
+      BABYLON.Angle.FromDegrees(0).radians(),
+      BABYLON.Angle.FromDegrees(0).radians()
+    );
+    backWall.position = new BABYLON.Vector3(0, 3, 3);
     backWall.parent = ground;
 
-    ground.position = new BABYLON.Vector3(-5,0.001,3)
-    ground.scaling = new BABYLON.Vector3(.5,.5,.5);
+    ground.position = new BABYLON.Vector3(-5, 0.001, 3);
+    ground.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
 
-    const radian = 0.0174533
+    const radian = 0.0174533;
 
     let newYeti: BABYLON.AbstractMesh = undefined;
 
-    BABYLON.SceneLoader.ImportMesh("", "https://assets.babylonjs.com/meshes/Yeti/MayaExport/glTF/",
-    "Yeti.gltf", this._scene, function (newMeshes) {
+    BABYLON.SceneLoader.ImportMesh(
+      "",
+      "https://assets.babylonjs.com/meshes/Yeti/MayaExport/glTF/",
+      "Yeti.gltf",
+      this._scene,
+      function (newMeshes) {
         newYeti = newMeshes[0];
-        newYeti.parent = ground
+        newYeti.parent = ground;
         newMeshes[0].scaling = new BABYLON.Vector3(0.05, 0.08, 0.05);
-        newMeshes[0].rotation = new BABYLON.Vector3(0 * radian, 180 * radian, 0 * radian);
-    });
+        newMeshes[0].rotation = new BABYLON.Vector3(
+          0 * radian,
+          180 * radian,
+          0 * radian
+        );
+      }
+    );
   }
 
   LoadVideo(): void {
-
     // Create a material from the video
     var mat = new BABYLON.StandardMaterial("mat", this._scene);
     var videoTexture = new BABYLON.VideoTexture(
       "video",
       [
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
       ],
       this._scene,
       true,
@@ -368,7 +407,11 @@ export default class MyScene {
     plane.scaling.x = 1920 / 1080; // set aspect ratio
     plane.material = mat;
     plane.position = new BABYLON.Vector3(0, 4, 7);
-    plane.rotation = new BABYLON.Vector3(0, BABYLON.Angle.FromDegrees(180).radians(), 0);
+    plane.rotation = new BABYLON.Vector3(
+      0,
+      BABYLON.Angle.FromDegrees(180).radians(),
+      0
+    );
 
     // Access video for play/pause
     var playing = false;
@@ -381,7 +424,6 @@ export default class MyScene {
       }
       playing = !playing;
     };
-
   }
 
   async SwordRotate(sword: BABYLON.AbstractMesh): Promise<void> {
@@ -398,7 +440,7 @@ export default class MyScene {
 
     const origPosition = alien.position;
 
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 30; i++) {
       await this.PositionObject(alien, posAlienDown, 100, 0.1);
       await this.PositionObject(alien, posAlienUp, 11, 0.1);
       await this.DelayIt(3);
@@ -407,10 +449,20 @@ export default class MyScene {
   }
 
   async BalloonAnimation(balloon: BABYLON.AbstractMesh): Promise<void> {
-    const pos = new BABYLON.Vector3(-0.05, 0, 0);
-    await this.PositionObject(balloon, pos);
-    const rot = new BABYLON.Vector3(0, -1, 0);
-    this.RotateObject(balloon, rot, 271, 0.05);
+    
+    const origPos = balloon.position;
+    const origRot = balloon.rotation;
+    for (var i = 1; i < 10; i++) {
+      const pos = new BABYLON.Vector3(-0.05, 0, 0);
+      await this.PositionObject(balloon, pos);
+      const rot = new BABYLON.Vector3(0, -1, 0);
+      await this.RotateObject(balloon, rot, 271, 0.05);
+      await this.DelayIt(5);
+      const posDown = new BABYLON.Vector3(0, -0.05, 0);
+      await this.PositionObject(balloon, posDown, 140, 0.1);
+      balloon.position = origPos
+      balloon.rotation =origRot
+    }
   }
 
   BorderHouse(): void {
