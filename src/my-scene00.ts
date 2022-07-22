@@ -257,6 +257,8 @@ export default class MyScene {
     this.LoadVideo();
     this.BorderHouse();
 
+    this.FloorWallArea();
+
     let cnt = 0;
     while (object[2] === null && cnt < 5) {
       await this.DelayIt(2);
@@ -297,6 +299,47 @@ export default class MyScene {
     // ground.scaling = new BABYLON.Vector3(3, 1, 1);
 
     return this._scene;
+  }
+
+  FloorWallArea() : void {
+    // Our built-in 'ground' shape.
+    var ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, this._scene);
+    var backWall = BABYLON.MeshBuilder.CreatePlane("backWall", { width: 6, height: 6 }, this._scene);
+    let groundMaterial = new BABYLON.StandardMaterial("Ground Material", this._scene);
+    let backMaterial = new BABYLON.StandardMaterial("Back Material", this._scene);
+    ground.material = groundMaterial;
+    backWall.material = backMaterial;
+
+    let groundTexture = new BABYLON.Texture("https://dl.dropbox.com/s/d774xc5km3l1gst/Floor-Stone-Portuguesa-Ground-Texture-Sidewalk-5224213.jpg?dl=0", this._scene);
+    let backTexture = new BABYLON.Texture("https://image.shutterstock.com/image-photo/basalt-stones-background-reynisfjara-beach-600w-2124570419.jpg", this._scene);
+   
+   
+    const temp1 =  <BABYLON.StandardMaterial>ground.material;
+    const temp2 =  <BABYLON.StandardMaterial>backWall.material;
+
+    temp1.diffuseTexture = groundTexture;
+    temp2.diffuseTexture = backTexture;
+    temp1.diffuseColor = BABYLON.Color3.Red(); //{r: 200/255, g: 0, b: 200/255};
+    temp2.diffuseColor = new BABYLON.Color3(200 / 255, 0, 200 / 255 );
+
+    backWall.rotation = new BABYLON.Vector3(BABYLON.Angle.FromDegrees(0).radians(), BABYLON.Angle.FromDegrees(0).radians(), BABYLON.Angle.FromDegrees(0).radians())
+    backWall.position = new BABYLON.Vector3(0,3,3)
+    backWall.parent = ground;
+
+    ground.position = new BABYLON.Vector3(-5,0.001,3)
+    ground.scaling = new BABYLON.Vector3(.5,.5,.5);
+
+    const radian = 0.0174533
+
+    let newYeti: BABYLON.AbstractMesh = undefined;
+
+    BABYLON.SceneLoader.ImportMesh("", "https://assets.babylonjs.com/meshes/Yeti/MayaExport/glTF/",
+    "Yeti.gltf", this._scene, function (newMeshes) {
+        newYeti = newMeshes[0];
+        newYeti.parent = ground
+        newMeshes[0].scaling = new BABYLON.Vector3(0.05, 0.08, 0.05);
+        newMeshes[0].rotation = new BABYLON.Vector3(0 * radian, 180 * radian, 0 * radian);
+    });
   }
 
   LoadVideo(): void {
