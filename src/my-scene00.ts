@@ -2,14 +2,49 @@ import * as BABYLON from "babylonjs";
 import "@babylonjs/loaders/glTF";
 import "babylonjs-loaders";
 
+import MySceneObjects from "./my_scene00_objects";
+import MySceneMethods from "./my_scene00_methods";
+import MySceneActions from "./my_scene00_actions";
+
+import { refractionPixelShader } from "babylonjs/Shaders/refraction.fragment";
+
 export default class MyScene {
-  private _canvas: HTMLCanvasElement;
-  private _engine: BABYLON.Engine;
-  private _scene: BABYLON.Scene;
-  //private _camera: BABYLON.FreeCamera;
-  private _camera: BABYLON.ArcRotateCamera;
-  private _light: BABYLON.DirectionalLight;
-  //private _radianVal: number;
+  public _canvas: HTMLCanvasElement;
+  public _engine: BABYLON.Engine;
+  public _scene: BABYLON.Scene;
+  //public _camera: BABYLON.FreeCamera;
+  public _camera: BABYLON.ArcRotateCamera;
+  public _light: BABYLON.DirectionalLight;
+  //public _radianVal: number;
+
+  ////////////////////////////////
+  // MODULES
+  ////////////////////////////////
+
+  public OBJMod: MySceneObjects;
+  public METHMod: MySceneMethods;
+  public ACTMod: MySceneActions;
+
+  ////////////////////////////////
+  // OBJECTS
+  ////////////////////////////////
+
+  public box: BABYLON.Mesh;
+
+  public yeti: BABYLON.AbstractMesh[] = [undefined, undefined];
+  public alien: BABYLON.AbstractMesh = undefined;
+  public object: BABYLON.AbstractMesh[] = [undefined, undefined, undefined];
+
+  public objectFileURL = [
+    "https://cdn-content-ingress.altvr.com/uploads/model/gltf/1691175786641359242/",
+    "https://cdn-content-ingress.altvr.com/uploads/model/gltf/1709202508846465311/",
+    "https://cdn-content-ingress.altvr.com/uploads/model/gltf/2050551949928956602/",
+  ];
+  public objectFileName = [
+    "GRIMECRAFT_Master_Sword.glb",
+    "balloon2.glb",
+    "CurtsShinyGreenBox.glb",
+  ];
 
   constructor(canvasElement: string) {
     // Create canvas and engine.
@@ -18,6 +53,19 @@ export default class MyScene {
   }
 
   async createScene(): Promise<BABYLON.Scene> {
+    this.OBJMod = new MySceneObjects();
+    this.OBJMod.appMain = this;
+
+    this.METHMod = new MySceneMethods();
+    this.METHMod.appMain = this;
+
+    this.ACTMod = new MySceneActions();
+    this.ACTMod.appMain = this;
+
+    this.METHMod.TestModule();
+    this.ACTMod.TestModule();
+    this.OBJMod.TestModule();
+
     this._scene = new BABYLON.Scene(this._engine);
 
     this._scene.ambientColor = new BABYLON.Color3(0.3, 0.3, 0.3);
@@ -56,243 +104,128 @@ export default class MyScene {
 
     this._light.position = new BABYLON.Vector3(0, 150, 70);
 
-    const box = BABYLON.MeshBuilder.CreateBox("box", {});
-    box.position = new BABYLON.Vector3(0, 0.5, -5);
+    this.OBJMod.SpawnBox();
 
-    //box.rotation = this._light.direction;
-    //box.scaling.x = .1;
-    box.scaling.z = 0.1;
-    //box.position = new BABYLON.Vector3(0, 5, -5);
+    this.OBJMod.SpawnHouse();
 
-    //BABYLON.SceneLoader.ImportMeshAsync("", "https://assets.babylonjs.com/meshes/", "both_houses_scene.babylon");
-    //BABYLON.SceneLoader.ImportMeshAsync("semi_house", "https://assets.babylonjs.com/meshes/", "both_houses_scene.babylon");
-    //BABYLON.SceneLoader.ImportMeshAsync("ground", "https://assets.babylonjs.com/meshes/", "both_houses_scene.babylon");
-    await BABYLON.SceneLoader.ImportMeshAsync(
-      ["semi_house"],
-      "https://assets.babylonjs.com/meshes/",
-      "both_houses_scene.babylon"
+    this.OBJMod.SpawnGround();
+
+    // Yeti: 0
+
+    var pos = new BABYLON.Vector3(-2.2, 0, 0);
+    var sca = new BABYLON.Vector3(0.025, 0.04, 0.04);
+    var rot = new BABYLON.Vector3(
+      BABYLON.Angle.FromDegrees(0).radians(),
+      BABYLON.Angle.FromDegrees(90).radians(),
+      BABYLON.Angle.FromDegrees(0).radians()
     );
 
-    //let ground: any = this._scene.rootNodes[2];
-    const ground = BABYLON.Mesh.CreateGround(
-      "ground",
-      40,
-      10,
-      1,
-      this._scene,
-      false
-    );
-    //const ground = BABYLON.Mesh.CreateGround("ground", 1000, 1000, 1, this._scene, false);
+    this.OBJMod.SpawnYeti(0, pos, sca, rot);
 
-    //ground.scaling = new BABYLON.Vector3(4, 1, 1);
+    // Yeti: 1
 
-    var groundMaterialShadow = new BABYLON.StandardMaterial(
-      "groundShadow",
-      this._scene
-    );
-    groundMaterialShadow.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-    groundMaterialShadow.specularColor = new BABYLON.Color3(0, 0, 0);
-
-    var groundMaterial = new BABYLON.StandardMaterial("ground", this._scene);
-    groundMaterial.diffuseColor = new BABYLON.Color3(0, 0.5, 0);
-    groundMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-    ground.material = groundMaterial;
-
-    ground.receiveShadows = true;
-
-    // Shadows
-    var shadowGenerator = new BABYLON.ShadowGenerator(1024, this._light);
-
-    const shadowMap = shadowGenerator.getShadowMap();
-    const shadowBox = box.clone();
-    shadowBox.position.z = box.position.z + 0.5;
-    shadowBox.position.y = box.position.y - 0.5;
-    shadowBox.rotation = new BABYLON.Vector3(
-      box.rotation.x + BABYLON.Angle.FromDegrees(90).radians(),
-      box.rotation.y,
-      box.rotation.z
+    pos = new BABYLON.Vector3(4, 0, 0);
+    sca = new BABYLON.Vector3(0.025, 0.04, 0.04);
+    rot = new BABYLON.Vector3(
+      BABYLON.Angle.FromDegrees(0).radians(),
+      BABYLON.Angle.FromDegrees(-90).radians(),
+      BABYLON.Angle.FromDegrees(0).radians()
     );
 
-    shadowBox.material = groundMaterialShadow;
+    this.OBJMod.SpawnYeti(1, pos, sca, rot);
 
-    shadowMap.renderList.push(shadowBox);
+    // Alien
 
-    var yeti1 = null;
-    var yeti2 = null;
-    var alien1 = null;
-    var object: BABYLON.AbstractMesh[] = [null, null, null];
-
-    //const objectFileURL = "https://cdn-content-ingress.altvr.com/uploads/model/gltf/"
-    //const objectFileName = "scene__1_.glb"
-    const objectFileURL = [
-      "https://cdn-content-ingress.altvr.com/uploads/model/gltf/1691175786641359242/",
-      "https://cdn-content-ingress.altvr.com/uploads/model/gltf/1709202508846465311/",
-      "https://cdn-content-ingress.altvr.com/uploads/model/gltf/2050551949928956602/",
-    ];
-    const objectFileName = [
-      "GRIMECRAFT_Master_Sword.glb",
-      "balloon2.glb",
-      "CurtsShinyGreenBox.glb",
-    ];
-    //https://cdn-content-ingress.altvr.com/uploads/model/gltf/1691175786641359242/GRIMECRAFT_Master_object.glb
-
-    //const objectFileURL = "https://samaaron.com/0babylon.js/files/glb/";
-    //const objectFileName = "object.glb";
-
-    BABYLON.SceneLoader.ImportMesh(
-      "",
-      //Assets.meshes.Yeti.rootUrl,
-      "https://assets.babylonjs.com/meshes/Yeti/MayaExport/glTF/",
-      //Assets.meshes.Yeti.filename,
-      "Yeti.gltf",
-      this._scene,
-      function (newMeshes, particleSystems, skeletons) {
-        yeti1 = newMeshes[0];
-        const yeti1Shadow = newMeshes[1];
-        yeti1Shadow.position.z = -0.5;
-        // Shadows
-        // var shadowGenerator = new BABYLON.ShadowGenerator(1024, this._light);
-        shadowGenerator.getShadowMap().renderList.push(yeti1Shadow);
-        newMeshes[0].position = new BABYLON.Vector3(-2.2, 0, 0);
-        newMeshes[0].scaling = new BABYLON.Vector3(0.025, 0.04, 0.04);
-        newMeshes[0].rotation = new BABYLON.Vector3(
-          BABYLON.Angle.FromDegrees(0).radians(),
-          BABYLON.Angle.FromDegrees(90).radians(),
-          BABYLON.Angle.FromDegrees(0).radians()
-        );
-      }
+    pos = new BABYLON.Vector3(1, 2, -0.5);
+    sca = new BABYLON.Vector3(1, 1, 1);
+    rot = new BABYLON.Vector3(
+      BABYLON.Angle.FromDegrees(20).radians(),
+      BABYLON.Angle.FromDegrees(180).radians(),
+      BABYLON.Angle.FromDegrees(0).radians()
     );
 
-    BABYLON.SceneLoader.ImportMesh(
-      "",
-      //Assets.meshes.Yeti.rootUrl,
-      "https://assets.babylonjs.com/meshes/Yeti/MayaExport/glTF/",
-      //Assets.meshes.Yeti.filename,
-      "Yeti.gltf",
-      this._scene,
-      function (newMeshes, particleSystems, skeletons) {
-        yeti2 = newMeshes[0];
-        newMeshes[0].position = new BABYLON.Vector3(4, 0, 0);
-        newMeshes[0].scaling = new BABYLON.Vector3(0.025, 0.04, 0.04);
-        newMeshes[0].rotation = new BABYLON.Vector3(
-          BABYLON.Angle.FromDegrees(0).radians(),
-          BABYLON.Angle.FromDegrees(-90).radians(),
-          BABYLON.Angle.FromDegrees(0).radians()
-        );
-      }
-    );
+    this.OBJMod.SpawnAlien(pos, sca, rot);
 
-    BABYLON.SceneLoader.ImportMesh(
-      "",
-      //Assets.meshes.Alien.rootUrl,
-      "https://assets.babylonjs.com/meshes/Alien/",
-      //Assets.meshes.Yeti.filename,
-      "Alien.gltf",
-      this._scene,
-      function (newMeshes) {
-        alien1 = newMeshes[0];
-        newMeshes[0].position = new BABYLON.Vector3(1, 2, -0.5);
-        newMeshes[0].scaling = new BABYLON.Vector3(1, 1, 1);
-        newMeshes[0].rotation = new BABYLON.Vector3(
-          BABYLON.Angle.FromDegrees(20).radians(),
-          BABYLON.Angle.FromDegrees(180).radians(),
-          BABYLON.Angle.FromDegrees(0).radians()
-        );
-      }
-    );
+    // Sword
 
-    BABYLON.SceneLoader.ImportMesh(
-      "",
-      objectFileURL[0],
-      objectFileName[0],
-      this._scene,
-      function (newMeshes) {
-        object[0] = newMeshes[0];
-        newMeshes[0].name = "sword";
-        newMeshes[0].position = new BABYLON.Vector3(3, 2.5, 0);
-        newMeshes[0].scaling = new BABYLON.Vector3(0.05, 0.05, 0.05);
-        newMeshes[0].rotation = new BABYLON.Vector3(
-          BABYLON.Angle.FromDegrees(0).radians(),
-          BABYLON.Angle.FromDegrees(0).radians(),
-          BABYLON.Angle.FromDegrees(0).radians()
-        );
-      }
-    );
+    pos = new BABYLON.Vector3(3, 2.5, 0);
+    sca = new BABYLON.Vector3(0.05, 0.05, 0.05);
+    rot = new BABYLON.Vector3(
+      BABYLON.Angle.FromDegrees(0).radians(),
+      BABYLON.Angle.FromDegrees(0).radians(),
+      BABYLON.Angle.FromDegrees(0).radians()    );
 
-    BABYLON.SceneLoader.ImportMesh(
-      "",
-      objectFileURL[1],
-      objectFileName[1],
-      this._scene,
-      function (newMeshes) {
-        object[1] = newMeshes[0];
-        newMeshes[0].name = "balloon";
-        newMeshes[0].position = new BABYLON.Vector3(17, 7, 4);
-        newMeshes[0].scaling = new BABYLON.Vector3(0.005, 0.005, 0.005);
-        newMeshes[0].rotation = new BABYLON.Vector3(
-          BABYLON.Angle.FromDegrees(0).radians(),
-          BABYLON.Angle.FromDegrees(90).radians(),
-          BABYLON.Angle.FromDegrees(0).radians()
-        );
-      }
-    );
+    this.OBJMod.SpawnObj(0, pos, sca, rot);
 
-    BABYLON.SceneLoader.ImportMesh(
-      "",
-      objectFileURL[2],
-      objectFileName[2],
-      this._scene,
-      function (newMeshes) {
-        object[2] = newMeshes[0];
-        newMeshes[0].name = "curtsCube";
-        newMeshes[0].position = new BABYLON.Vector3(1, 6, 4);
-        newMeshes[0].scaling = new BABYLON.Vector3(2, 0.4, 0.3);
-        newMeshes[0].rotation = new BABYLON.Vector3(
-          BABYLON.Angle.FromDegrees(0).radians(),
-          BABYLON.Angle.FromDegrees(90).radians(),
-          BABYLON.Angle.FromDegrees(0).radians()
-        );
-      }
-    );
+    // Balloon
 
-    this.LoadVideo();
-    
-    this.BorderHouse();
+    pos = new BABYLON.Vector3(17, 7, 4);
+    sca = new BABYLON.Vector3(0.005, 0.005, 0.005);
+    rot = new BABYLON.Vector3(
+      BABYLON.Angle.FromDegrees(0).radians(),
+      BABYLON.Angle.FromDegrees(90).radians(),
+      BABYLON.Angle.FromDegrees(0).radians()    );
 
-    this.FloorWallArea();
+    this.OBJMod.SpawnObj(1, pos, sca, rot);
+
+    // Curts Cube
+
+    pos = new BABYLON.Vector3(1, 6, 4);
+    sca = new BABYLON.Vector3(2, 0.4, 0.3);
+    rot = new BABYLON.Vector3(
+      BABYLON.Angle.FromDegrees(0).radians(),
+      BABYLON.Angle.FromDegrees(90).radians(),
+      BABYLON.Angle.FromDegrees(0).radians()    );
+
+    this.OBJMod.SpawnObj(2, pos, sca, rot);
+
+    //Video
+
+    this.OBJMod.LoadVideo();
+
+    //Border House Fence
+
+    this.OBJMod.BorderHouse();
+
+    //Border Floor/Back Wall and Yeti
+
+    this.OBJMod.FloorWallArea();
+
+    //Make sure all Items are retrieved before continuing
 
     let cnt = 0;
-    while (object[2] === null && cnt < 5) {
-      await this.DelayIt(2);
+    while (this.object[2] === null && cnt < 5) {
+      await this.METHMod.DelayIt(2);
       console.log(`waiting for object [2], try: ${cnt}`);
       cnt++;
     }
     cnt = 0;
-    while (object[1] === null && cnt < 5) {
-      await this.DelayIt(2);
+    while (this.object[1] === null && cnt < 5) {
+      await this.METHMod.DelayIt(2);
       console.log(`waiting for object [1], try: ${cnt}`);
       cnt++;
     }
     cnt = 0;
-    while (object[0] === null && cnt < 5) {
-      await this.DelayIt(2);
+    while (this.object[0] === null && cnt < 5) {
+      await this.METHMod.DelayIt(2);
       console.log(`waiting for object [0], try: ${cnt}`);
       cnt++;
     }
 
-    console.log(`waiting 3 secs... before animation`);
-    await this.DelayIt(1);
-    console.log(`waiting 2 secs... before animation`);
-    await this.DelayIt(1);
-    console.log(`waiting 1 secs... before animation`);
-    await this.DelayIt(1);
+    await this.METHMod.DelayIt(1);
 
-    this.RotateCube(object[2]);
+    // Make sure Balloon returns before continue...
+    while (!this.object[1]){
+      await this.METHMod.DelayIt(1)
+    }
 
-    this.SwordRotate(object[0]);
+    this.ACTMod.BalloonAnimation(this.object[1]);
 
-    this.BalloonAnimation(object[1]);
-    this.AlienDownUP(alien1);
+    this.ACTMod.RotateCube(this.object[2]);
+
+    this.ACTMod.RotateSword(this.object[0]);
+
+    this.ACTMod.AlienDownUP(this.alien);
 
     // const ground: any = this._scene.rootNodes[2];
 
@@ -300,319 +233,6 @@ export default class MyScene {
 
     return this._scene;
   }
-
-  async RotateCube(cube: BABYLON.AbstractMesh): Promise<void> {
-    const rotCube = new BABYLON.Vector3(0, -0.5, 0);
-
-    for (var i = 0; i < 10;i++){
-      await this.RotateObject(cube, rotCube, 3601, 0.0125);
-    }
-  }
-
-  FloorWallArea(): void {
-    // Our built-in 'ground' shape.
-    var ground = BABYLON.MeshBuilder.CreateGround(
-      "ground",
-      { width: 6, height: 6 },
-      this._scene
-    );
-    var backWall = BABYLON.MeshBuilder.CreatePlane(
-      "backWall",
-      { width: 6, height: 6 },
-      this._scene
-    );
-    let groundMaterial = new BABYLON.StandardMaterial(
-      "Ground Material",
-      this._scene
-    );
-    let backMaterial = new BABYLON.StandardMaterial(
-      "Back Material",
-      this._scene
-    );
-    ground.material = groundMaterial;
-    backWall.material = backMaterial;
-
-    let groundTexture = new BABYLON.Texture(
-      "https://dl.dropbox.com/s/d774xc5km3l1gst/Floor-Stone-Portuguesa-Ground-Texture-Sidewalk-5224213.jpg?dl=0",
-      this._scene
-    );
-    let backTexture = new BABYLON.Texture(
-      "https://image.shutterstock.com/image-photo/basalt-stones-background-reynisfjara-beach-600w-2124570419.jpg",
-      this._scene
-    );
-
-    const temp1 = <BABYLON.StandardMaterial>ground.material;
-    const temp2 = <BABYLON.StandardMaterial>backWall.material;
-
-    temp1.diffuseTexture = groundTexture;
-    temp2.diffuseTexture = backTexture;
-    temp1.diffuseColor = BABYLON.Color3.Red(); //{r: 200/255, g: 0, b: 200/255};
-    temp2.diffuseColor = new BABYLON.Color3(200 / 255, 0, 200 / 255);
-
-    backWall.rotation = new BABYLON.Vector3(
-      BABYLON.Angle.FromDegrees(0).radians(),
-      BABYLON.Angle.FromDegrees(0).radians(),
-      BABYLON.Angle.FromDegrees(0).radians()
-    );
-    backWall.position = new BABYLON.Vector3(0, 3, 3);
-    backWall.parent = ground;
-
-    ground.position = new BABYLON.Vector3(-5, 0.001, 3);
-    ground.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-
-    const radian = 0.0174533;
-
-    let newYeti: BABYLON.AbstractMesh = undefined;
-
-    BABYLON.SceneLoader.ImportMesh(
-      "",
-      "https://assets.babylonjs.com/meshes/Yeti/MayaExport/glTF/",
-      "Yeti.gltf",
-      this._scene,
-      function (newMeshes) {
-        newYeti = newMeshes[0];
-        newYeti.parent = ground;
-        newMeshes[0].scaling = new BABYLON.Vector3(0.05, 0.08, 0.05);
-        newMeshes[0].rotation = new BABYLON.Vector3(
-          0 * radian,
-          180 * radian,
-          0 * radian
-        );
-      }
-    );
-  }
-
-  LoadVideo(): void {
-    // Create a material from the video
-    var mat = new BABYLON.StandardMaterial("mat", this._scene);
-    var videoTexture = new BABYLON.VideoTexture(
-      "video",
-      [
-        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-      ],
-      this._scene,
-      true,
-      false
-    );
-
-    videoTexture.getAlphaFromRGB = true;
-    mat.emissiveTexture = videoTexture;
-
-    // Attach the video material the a mesh
-    var plane = BABYLON.MeshBuilder.CreatePlane(
-      "plane1",
-      { height: 6, width: 7 },
-      this._scene
-    );
-    plane.scaling.x = 1920 / 1080; // set aspect ratio
-    plane.material = mat;
-    plane.position = new BABYLON.Vector3(0, 4, 7);
-    plane.rotation = new BABYLON.Vector3(
-      0,
-      BABYLON.Angle.FromDegrees(180).radians(),
-      0
-    );
-
-    // Access video for play/pause
-    var playing = false;
-    videoTexture.video.pause();
-    document.onclick = () => {
-      if (playing) {
-        videoTexture.video.pause();
-      } else {
-        videoTexture.video.play();
-      }
-      playing = !playing;
-    };
-  }
-
-  async SwordRotate(sword: BABYLON.AbstractMesh): Promise<void> {
-    const rot = new BABYLON.Vector3(0, 3, 0);
-
-    for (var i = 0; i < 10; i++) {
-      await this.RotateObject(sword, rot);
-    }
-  }
-
-  async AlienDownUP(alien: BABYLON.Mesh): Promise<void> {
-    const posAlienDown = new BABYLON.Vector3(0, -0.01, 0.005);
-    const posAlienUp = new BABYLON.Vector3(0, 0.1, -0.05);
-
-    const origPosition = alien.position;
-
-    for (var i = 0; i < 30; i++) {
-      await this.PositionObject(alien, posAlienDown, 100, 0.1);
-      await this.PositionObject(alien, posAlienUp, 11, 0.1);
-      await this.DelayIt(3);
-      alien.position = origPosition;
-    }
-  }
-
-  async BalloonAnimation(balloon: BABYLON.AbstractMesh): Promise<void> {
-    
-    const origPos = balloon.position;
-    const origRot = balloon.rotation;
-    for (var i = 1; i < 10; i++) {
-      const pos = new BABYLON.Vector3(-0.05, 0, 0);
-      await this.PositionObject(balloon, pos);
-      const rot = new BABYLON.Vector3(0, -1, 0);
-      await this.RotateObject(balloon, rot, 271, 0.05);
-      await this.DelayIt(5);
-      const posDown = new BABYLON.Vector3(0, -0.05, 0);
-      await this.PositionObject(balloon, posDown, 140, 0.1);
-      balloon.position = origPos
-      balloon.rotation =origRot
-    }
-  }
-
-  BorderHouse(): void {
-    // My attempt to color the sphere
-    const materialRed = new BABYLON.StandardMaterial("", this._scene);
-    materialRed.alpha = 1;
-    materialRed.diffuseColor = new BABYLON.Color3(1.0, 0, 0);
-
-    const materialYellow = new BABYLON.StandardMaterial("", this._scene);
-    materialYellow.alpha = 1;
-    materialYellow.diffuseColor = BABYLON.Color3.Yellow();
-
-    const height = 0.8;
-    const posY = 0.3;
-
-    const startfenceX = -1;
-    const fenceXPosts = 42;
-    const fenceZPosts = 20;
-
-    for (let i = 0; i < fenceXPosts; i++) {
-      const fencePost = BABYLON.MeshBuilder.CreateSphere(
-        "sphere",
-        { diameter: 0.1, diameterY: height },
-        this._scene
-      );
-      if (i % 2 === 0) {
-        fencePost.material = materialRed;
-      } else {
-        fencePost.material = materialYellow;
-      }
-      fencePost.position = new BABYLON.Vector3(i * 0.1 + startfenceX, posY, -1);
-    }
-
-    for (let i = 0; i < fenceXPosts; i++) {
-      const fencePost = BABYLON.MeshBuilder.CreateSphere(
-        "sphere",
-        { diameter: 0.1, diameterY: height },
-        this._scene
-      );
-      if (i % 2 === 0) {
-        fencePost.material = materialRed;
-      } else {
-        fencePost.material = materialYellow;
-      }
-
-      fencePost.position = new BABYLON.Vector3(i * 0.1 + startfenceX, posY, 1);
-    }
-
-    for (let i = 0; i < fenceZPosts; i++) {
-      const fencePost = BABYLON.MeshBuilder.CreateSphere(
-        "sphere",
-        { diameter: 0.1, diameterY: height },
-        this._scene
-      );
-      if (i % 2 === 0) {
-        fencePost.material = materialRed;
-      } else {
-        fencePost.material = materialYellow;
-      }
-
-      fencePost.position = new BABYLON.Vector3(startfenceX, posY, i * 0.1 + -1);
-    }
-    for (let i = 0; i < fenceZPosts; i++) {
-      const fencePost = BABYLON.MeshBuilder.CreateSphere(
-        "sphere",
-        { diameter: 0.1, diameterY: height },
-        this._scene
-      );
-      if (i % 2 === 0) {
-        fencePost.material = materialRed;
-      } else {
-        fencePost.material = materialYellow;
-      }
-
-      fencePost.position = new BABYLON.Vector3(3.15, posY, i * 0.1 + -1);
-    }
-  }
-
-  async RotateObject(
-    object: BABYLON.AbstractMesh,
-    newRotation: BABYLON.Vector3,
-    loop = 211,
-    delay = 0.5
-  ): Promise<void> {
-    console.log(`Begin Rotation: ${object.name}`);
-
-    let lastIntY = BABYLON.Angle.FromRadians(object.rotation._y).radians();
-    lastIntY = Math.floor(lastIntY);
-
-    for (let i = 1; i < loop; i++) {
-      await this.DelayIt(delay);
-
-      const objRotX = BABYLON.Angle.FromRadians(object.rotation._x).degrees();
-      const objRotY = BABYLON.Angle.FromRadians(object.rotation._y).degrees();
-      const objRotZ = BABYLON.Angle.FromRadians(object.rotation._z).degrees();
-
-      object.rotation = new BABYLON.Vector3(
-        BABYLON.Angle.FromDegrees(objRotX + newRotation._x).radians(),
-        BABYLON.Angle.FromDegrees(objRotY + newRotation._y).radians(),
-        BABYLON.Angle.FromDegrees(objRotZ + newRotation._z).radians()
-      );
-
-      let currentIntY = BABYLON.Angle.FromRadians(object.rotation._y).degrees();
-      currentIntY = Math.floor(currentIntY);
-      if (currentIntY !== lastIntY) {
-        console.log(
-          `Current Rotation ${object.name} Y: ${currentIntY} Loop: ${i}`
-        );
-        lastIntY = currentIntY;
-        if (currentIntY < 0) {
-          object.rotation._y = BABYLON.Angle.FromDegrees(360).radians();
-        }
-        if (currentIntY > 360) {
-          object.rotation._y = 0;
-        }
-      }
-    }
-  }
-
-  async PositionObject(
-    object: BABYLON.AbstractMesh,
-    newPosition: BABYLON.Vector3,
-    loop = 994,
-    delay = 0.05
-  ): Promise<void> {
-    console.log(`Begin Position: ${object.name}`);
-
-    let lastIntX = Math.floor(object.position._x);
-    for (let i = 1; i < loop; i++) {
-      await this.DelayIt(delay);
-      object.position = new BABYLON.Vector3(
-        object.position._x + newPosition._x,
-        object.position._y + newPosition._y,
-        object.position._z + newPosition._z
-      );
-      const currentIntX = Math.floor(object.position._x);
-      if (currentIntX !== lastIntX) {
-        console.log(
-          `Current Position ${object.name} X: ${currentIntX} Loop: ${i}`
-        );
-        lastIntX = currentIntX;
-        if (currentIntX < -17) {
-          object.position._x = 17;
-        }
-      }
-    }
-  }
-
-  private DelayIt = (secs: number) =>
-    new Promise((res) => setTimeout(res, secs * 1000));
 
   doRender(): void {
     // Run the render loop.
