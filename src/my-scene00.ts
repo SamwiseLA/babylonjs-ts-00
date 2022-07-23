@@ -37,12 +37,14 @@ export default class MyScene {
 
   public objectFileURL = [
     "https://cdn-content-ingress.altvr.com/uploads/model/gltf/1691175786641359242/",
-    "https://cdn-content-ingress.altvr.com/uploads/model/gltf/1709202508846465311/",
+    //"https://cdn-content-ingress.altvr.com/uploads/model/gltf/1709202508846465311/",
+    "https://cdn-content-ingress.altvr.com/uploads/model/gltf/2052010387502531539/",
     "https://cdn-content-ingress.altvr.com/uploads/model/gltf/2050551949928956602/",
   ];
   public objectFileName = [
     "GRIMECRAFT_Master_Sword.glb",
-    "balloon2.glb",
+    //"balloon2.glb",
+    "viva_balloon.glb",
     "CurtsShinyGreenBox.glb",
   ];
 
@@ -159,8 +161,9 @@ export default class MyScene {
 
     // Balloon
 
-    pos = new BABYLON.Vector3(17, 7, 4);
-    sca = new BABYLON.Vector3(0.005, 0.005, 0.005);
+    //pos = new BABYLON.Vector3(17, 7, 4);
+    pos = new BABYLON.Vector3(18, 1, 6);
+    sca = new BABYLON.Vector3(10, 10, 10);
     rot = new BABYLON.Vector3(
       BABYLON.Angle.FromDegrees(0).radians(),
       BABYLON.Angle.FromDegrees(90).radians(),
@@ -221,9 +224,24 @@ export default class MyScene {
 
     this.ACTMod.BalloonAnimation(this.object[1]);
 
+    // Make sure Cube returns before continue...
+    while (!this.object[2]){
+      await this.METHMod.DelayIt(1)
+    }
+
     this.ACTMod.RotateCube(this.object[2]);
 
+    // Make sure Sword returns before continue...
+    while (!this.object[0]){
+      await this.METHMod.DelayIt(1)
+    }
+
     this.ACTMod.RotateSword(this.object[0]);
+
+    // Make sure Alien returns before continue...
+    while (!this.alien){
+      await this.METHMod.DelayIt(1)
+    }
 
     this.ACTMod.AlienDownUP(this.alien);
 

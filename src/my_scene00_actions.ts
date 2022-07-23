@@ -73,12 +73,12 @@ export default class MySceneActions {
     const origRot = balloon.rotation;
     for (var i = 1; i < 10; i++) {
       const pos = new BABYLON.Vector3(-0.05, 0, 0);
-      await this.PositionObject(balloon, pos);
+      await this.PositionObject(balloon, pos, 1024, .05);
       const rot = new BABYLON.Vector3(0, -1, 0);
       await this.RotateObject(balloon, rot, 271, 0.05);
       await this.appMain.METHMod.DelayIt(5);
       const posDown = new BABYLON.Vector3(0, -0.05, 0);
-      await this.PositionObject(balloon, posDown, 140, 0.1);
+      await this.PositionObject(balloon, posDown, 200, 0.1);
       balloon.position = origPos;
       balloon.rotation = origRot;
     }
@@ -87,8 +87,8 @@ export default class MySceneActions {
   async PositionObject(
     object: BABYLON.AbstractMesh,
     newPosition: BABYLON.Vector3,
-    loop = 994,
-    delay = 0.05
+    loop = 1,
+    delay = 1
   ): Promise<void> {
     console.log(`Begin Position: ${object.name}`);
 
@@ -106,8 +106,8 @@ export default class MySceneActions {
           `Current Position ${object.name} X: ${currentIntX} Loop: ${i}`
         );
         lastIntX = currentIntX;
-        if (currentIntX < -17) {
-          object.position._x = 17;
+        if (currentIntX < -18) {
+          object.position._x = 18;
         }
       }
     }
