@@ -31,7 +31,7 @@ export default class MyScene {
 
   public box: BABYLON.Mesh;
 
-  public yeti: BABYLON.AbstractMesh[] = [undefined, undefined];
+  public yeti: BABYLON.AbstractMesh[] = [undefined, undefined, undefined];
   public alien: BABYLON.AbstractMesh = undefined;
   public object: BABYLON.AbstractMesh[] = [undefined, undefined, undefined];
 

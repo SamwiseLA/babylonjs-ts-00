@@ -69,6 +69,32 @@ export default class MySceneActions {
   }
 
   async BalloonAnimation(balloon: BABYLON.AbstractMesh): Promise<void> {
+
+
+    const radian = 0.0174533;
+
+    let newYeti: BABYLON.AbstractMesh = undefined;
+
+    const appMain = this.appMain;
+
+    BABYLON.SceneLoader.ImportMesh(
+      "",
+      "https://assets.babylonjs.com/meshes/Yeti/MayaExport/glTF/",
+      "Yeti.gltf",
+      this.appMain._scene,
+      function (newMeshes) {
+        appMain.yeti[2] = newMeshes[0];
+        newMeshes[0].parent = appMain.object[1];
+        newMeshes[0].position = new BABYLON.Vector3(.155, 0.22, 0);
+        newMeshes[0].scaling = new BABYLON.Vector3(0.0018, 0.0018, 0.0018);
+        newMeshes[0].rotation = new BABYLON.Vector3(
+          0 * radian,
+          90 * radian,
+          0 * radian
+        );
+      }
+    );
+
     const origPos = balloon.position;
     const origRot = balloon.rotation;
     for (var i = 1; i < 10; i++) {
