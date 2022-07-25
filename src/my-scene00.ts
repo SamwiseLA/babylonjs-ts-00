@@ -6,8 +6,6 @@ import MySceneObjects from "./my_scene00_objects";
 import MySceneMethods from "./my_scene00_methods";
 import MySceneActions from "./my_scene00_actions";
 
-import { refractionPixelShader } from "babylonjs/Shaders/refraction.fragment";
-
 export default class MyScene {
   public _canvas: HTMLCanvasElement;
   public _engine: BABYLON.Engine;
