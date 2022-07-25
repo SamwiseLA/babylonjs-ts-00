@@ -29,6 +29,8 @@ export default class MyScene {
   // OBJECTS
   ////////////////////////////////
 
+  public music: BABYLON.Sound;
+
   public box: BABYLON.Mesh;
 
   public yeti: BABYLON.AbstractMesh[] = [undefined, undefined, undefined];
@@ -105,6 +107,25 @@ export default class MyScene {
     this._light.intensity = 0.5;
 
     this._light.position = new BABYLON.Vector3(0, 150, 70);
+
+    // Load the Sound 
+    //
+    // and play it automatically once ready
+    //
+
+    //const uri =
+    //  "https://cdn-content-ingress.altvr.com/uploads/audio_clip/audio/1793021533619224851/ogg_220173__gameaudio__spacey-1up-power-up.ogg";
+
+    const uri = "https://cdn-content-ingress.altvr.com/uploads/audio_clip/audio/1734282589813867336/ogg_Girl_From_Ipanema_-_Frank_Sinatra.ogg"
+
+    //this.appMain.music = new BABYLON.Sound("cello", "sounds/cellolong.wav", this.appMain._scene, null, { loop: true, autoplay: true });
+    this.music = new BABYLON.Sound(
+      "sound1",
+      uri,
+      this._scene,
+      null,
+      { loop: false, autoplay: true, volume: 0.05 }
+    );
 
     this.OBJMod.SpawnBox();
 

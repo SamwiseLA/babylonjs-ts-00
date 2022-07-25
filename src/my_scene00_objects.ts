@@ -152,7 +152,7 @@ export default class MySceneObjects {
 
     //const uri = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
     //const uri = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4";
-    const uri = "https://dl.dropbox.com/s/garqyorkwtxhgpe/03_edith_piaf_said_it_better_than_me.mp4?dl=0"
+    const uri = "https://dl.dropbox.com/s/garqyorkwtxhgpe/03_edith_piaf_said_it_better_than_me.mp4?dl=1";
 
     var videoTexture = new BABYLON.VideoTexture(
       "video",

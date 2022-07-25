@@ -16,7 +16,7 @@
     "babylonjs": "^4.2.2",
     "babylonjs-gui": "^4.1.0",
     "babylonjs-loaders": "^4.1.0",
-    "babylonjs-materials": "^4.1.0",
+    "babylonjs-materials": "^4.2.2",
     "ts-loader": "^8.0.1",
     "typescript": "^3.9.7",
     "webpack": "^4.44.1",
