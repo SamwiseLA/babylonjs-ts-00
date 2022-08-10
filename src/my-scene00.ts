@@ -125,6 +125,10 @@ export default class MyScene {
       { loop: true, autoplay: true, volume: 0.05 }
     );
 
+    const label = this.METHMod.DisplayText("After you Unmute-> Click: Toggle Video, AltClick: Toggle Music")
+    label.position = new BABYLON.Vector3(-4, .25, -5);
+    label.scaling = new BABYLON.Vector3(5,5,.01);
+
     this.OBJMod.SpawnBox();
 
     this.OBJMod.SpawnHouse();

@@ -152,13 +152,12 @@ export default class MySceneObjects {
 
     //const uri = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
     //const uri = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4";
-    const uri = "https://dl.dropbox.com/s/garqyorkwtxhgpe/03_edith_piaf_said_it_better_than_me.mp4?dl=1";
+    const uri =
+      "https://dl.dropbox.com/s/garqyorkwtxhgpe/03_edith_piaf_said_it_better_than_me.mp4?dl=1";
 
     var videoTexture = new BABYLON.VideoTexture(
       "video",
-      [
-        uri,
-      ],
+      [uri],
       this.appMain._scene,
       true,
       false
@@ -167,7 +166,7 @@ export default class MySceneObjects {
     //videoTexture.getAlphaFromRGB = true;
     mat.emissiveTexture = videoTexture;
 
-    mat. disableLighting = true;
+    mat.disableLighting = true;
 
     // Attach the video material the a mesh
     var monitor = BABYLON.MeshBuilder.CreatePlane(
@@ -185,18 +184,36 @@ export default class MySceneObjects {
     );
 
     // Access video for play/pause
-    var playing = false;
+    var videoPlaying = false;
+    var musicPlaying = true;
     videoTexture.video.pause();
     //if (document.onclick) {
       document.onclick = () => {
-        if (playing) {
-          videoTexture.video.pause();
-        } else {
-          videoTexture.video.play();
+        const appMain = this.appMain;
+        const audioEngine = BABYLON.Engine?.audioEngine;
+        const unlocked = BABYLON.Engine?.audioEngine.unlocked;
+        if (unlocked) {
+          if (videoPlaying) {
+            videoTexture.video.pause();
+          } else {
+            videoTexture.video.play();
+          }
+          videoPlaying = !videoPlaying;
         }
-        playing = !playing;
       };
-    //}
+      document.onauxclick = () => {
+        const appMain = this.appMain;
+        const unlocked = BABYLON.Engine?.audioEngine.unlocked;
+        if (unlocked) {
+          if (musicPlaying) {
+            this.appMain.music.pause();
+          } else {
+            this.appMain.music.play();
+          }
+          musicPlaying = !musicPlaying
+        }
+      };
+        //}
   }
 
   FloorWallArea(): void {
@@ -278,7 +295,10 @@ export default class MySceneObjects {
     materialRed.alpha = 1;
     materialRed.diffuseColor = new BABYLON.Color3(1.0, 0, 0);
 
-    const materialYellow = new BABYLON.StandardMaterial("", this.appMain._scene);
+    const materialYellow = new BABYLON.StandardMaterial(
+      "",
+      this.appMain._scene
+    );
     materialYellow.alpha = 1;
     materialYellow.diffuseColor = BABYLON.Color3.Yellow();
 
@@ -347,7 +367,6 @@ export default class MySceneObjects {
       fencePost.position = new BABYLON.Vector3(3.15, posY, i * 0.1 + -1);
     }
   }
-
 
   GetFuncName() {
     var stack = new Error().stack,
